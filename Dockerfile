@@ -15,6 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
+RUN groupadd --gid 1001 djangouser && \
+    useradd --uid 1001 --gid 1001 --create-home --shell /bin/bash djangouser
+
+USER djangouser
+
 EXPOSE 8000
 
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
