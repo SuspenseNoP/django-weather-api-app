@@ -1,13 +1,15 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.conf import settings
 import requests
-import os
 
-API_KEY = os.environ.get('WEATHER_API_KEY')
 BASE_URL = 'http://api.openweathermap.org/data/2.5/weather'
 
 @api_view(['Get', 'POST'])
 def weather_api(request):
+
+    api_key = settings.WEATHER_API_KEY
+
     if request.method == 'GET':
         # GET-параметры передаются в URL: /api/weather/?city=City&lang=lang
         city = request.query_params.get('city')
@@ -21,7 +23,7 @@ def weather_api(request):
     
     params = {
         'q' : city,
-        'appid' : API_KEY,
+        'appid' : api_key,
         'units' : 'metric',
         'lang' : lang
     }
