@@ -3,12 +3,12 @@ from rest_framework.response import Response
 from django.conf import settings
 import requests
 
-BASE_URL = 'http://api.openweathermap.org/data/2.5/weather'
 
 @api_view(['Get', 'POST'])
 def weather_api(request):
 
     api_key = settings.WEATHER_API_KEY
+    base_url = settings.BASE_URL
 
     if request.method == 'GET':
         # GET-параметры передаются в URL: /api/weather/?city=City&lang=lang
@@ -28,7 +28,7 @@ def weather_api(request):
         'lang' : lang
     }
 
-    response = requests.get(BASE_URL, params=params)
+    response = requests.get(base_url, params=params)
     data = response.json()
 
     if response.status_code != 200:

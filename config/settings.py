@@ -33,6 +33,8 @@ WEATHER_API_KEY = env('WEATHER_API_KEY')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1'])
 
+BASE_URL = env("BASE_URL")
+
 
 # Application definition
 
