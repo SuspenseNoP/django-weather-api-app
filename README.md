@@ -134,3 +134,10 @@ curl -X POST http://localhost:8000/api/weather/ \
   -d '{"city": "Rome", "lang": "ru"}'
 ```
 
+### TODO 
+
+- [ ] Add Infrastructure as Code (IaC) setup for cloud providers (e.g. AWS, Azure)
+- [ ] Implement CI/CD pipeline for deployment to cloud (e.g. via GitHub Actions)
+- [ ] Store request history in a database (e.g. MongoDB)
+
+
