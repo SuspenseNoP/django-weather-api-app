@@ -1,9 +1,30 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Virtual environments
 .venv/
 venv/
+
+# Env vars
 .env
-.git
+
+# Git
+.git/
+.gitignore
+
+# Docker
 .dockerignore
+Dockerfile
+
+# Terraform
+terraform/
+
+# SSH keys
+keys/
+
+# Logs
+*.log
+*.out

@@ -10,3 +10,9 @@ venv/
 .env
 
 db.sqlite3
+
+/keys/admin-ssh-key
+
+.terraform
+*.lock.hcl
+*.tfstate*
