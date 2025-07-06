@@ -1,0 +1,7 @@
+aws_region = "eu-north-1"
+ec2_instance = "django_app"
+instance_type = "t3.micro"
+key_name = "admin-ssh-key"
+ssh_public_key_path = "../keys/admin-ssh-key.pub"
+vpc_name = "app-vpc"
+sg_name = "instance-access"
