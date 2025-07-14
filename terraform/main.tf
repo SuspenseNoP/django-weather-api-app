@@ -105,6 +105,19 @@ module "ec2" {
 
   associate_public_ip_address = true
 
+  user_data = <<-EOF
+              #!/bin/bash
+              set -e
+
+              apt-get update -y
+              apt-get install -y docker.io docker-compose
+
+              systemctl enable docker
+              systemctl start docker
+
+              usermod -aG docker ubuntu
+              EOF
+
   tags = {
     Terraform = "true"
   }
