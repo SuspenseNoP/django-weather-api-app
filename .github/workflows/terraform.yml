@@ -14,7 +14,7 @@ on:
 
 jobs:
   terraform:
-    name: Terraform Apply
+    name: Terraform
     runs-on: ubuntu-latest
 
     defaults:
