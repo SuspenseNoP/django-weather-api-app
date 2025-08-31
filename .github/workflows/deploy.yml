@@ -1,0 +1,71 @@
+name: Deploy Django to EC2
+
+on:
+  workflow_run:
+    workflows: ["Build and Publish Docker Image"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout infrastructure
+        uses: actions/checkout@v4
+        with:
+          path: terraform
+      
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Get EC2 IP
+        working-directory: ./terraform
+        run: |
+          echo "EC2_HOST=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Create .env file on EC2
+        run: |
+          echo "${{ secrets.DJANGO_ENV_FILE }}" | ssh -o StrictHostKeyChecking=no ubuntu@${{ env.EC2_HOST }} "cat > /home/ubuntu/.env"
+      
+      - name: Wait for EC2 to become ready with Docker
+        run: |
+          echo "Waiting for EC2 at ${{ env.EC2_HOST }} to be ready..."
+
+          for i in {1..30}; do
+            if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 ubuntu@${{ env.EC2_HOST }} 'command -v docker' >/dev/null 2>&1; then
+              echo "EC2 is ready and Docker is installed."
+              break
+            fi
+            echo "Still waiting... ($i/30)"
+            sleep 10
+          done
+
+      - name: Pull and start Docker on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ env.EC2_HOST }} << 'EOF'
+            echo "Logging in to GHCR"
+            echo "${{ secrets.GITHUB_TOKEN }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "Pulling latest image"
+            sudo docker pull ghcr.io/${{ secrets.REPO_OWNER }}/${{ secrets.IMAGE_NAME }}:latest
+
+            echo "Cleaning up old container"
+            sudo docker stop weather-app || true
+            sudo docker rm weather-app || true
+
+            echo "Running container"
+            sudo docker run -d \
+              --name weather-app \
+              --env-file /home/ubuntu/.env \
+              -p 8000:8000 \
+              ghcr.io/${{ secrets.REPO_OWNER }}/${{ secrets.IMAGE_NAME }}:latest
+          EOF
+
