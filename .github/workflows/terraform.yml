@@ -51,6 +51,16 @@ jobs:
         if: ${{ github.event.inputs.action == 'apply' && steps.validate.outcome == 'success' }}
         run: terraform apply -auto-approve
 
+      - name: Save EC2 IP to secrets
+        if: ${{ github.event.inputs.action == 'apply' && steps.validate.outcome == 'success' }}
+        working-directory: ./terraform
+        run: |
+          EC2_IP=$(terraform output -raw ec2_instance_public_ip)
+          echo "Updating EC2_HOST secret with $EC2_IP"
+          gh secret set EC2_HOST -b"$EC2_IP"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         run: terraform destroy -auto-approve
