@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/suspensenop/django-weather-api-app:latest
     container_name: weather-app
     env_file:
       - .env 
