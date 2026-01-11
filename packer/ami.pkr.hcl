@@ -37,28 +37,44 @@ build {
     script = "../scripts/install_docker.sh"
   }
 
-  #App Files
-  provisioner "file"{
-    source = "../docker"
-    destination = "/opt/weather-app"
-  }
-
-  provisioner "shell"{
+  provisioner "shell" {
     inline = [
-      "cd /opt/weather-app",
-      "docker compose pull"
+      "mkdir -p /home/ubuntu/tmp"
     ]
   }
 
+  #Files
   provisioner "file"{
-    source = "../scripts/docker-compose-app.service"
-    destination = "/etc/systemd/system/weather-app.service"
+    source = "../docker"
+    destination = "/home/ubuntu/tmp"
+  }
+
+  provisioner "file"{
+    source = "../.env"
+    destination = "/home/ubuntu/tmp/.env"
+  }
+
+  provisioner "file"{
+    source = "../scripts"
+    destination = "/home/ubuntu/tmp"
   }
 
   provisioner "shell"{
     inline = [
-      "systemctl daemon-reload",
-      "systemctl enable weather-app "
+      "sudo mkdir -p /opt/weather-app",
+      "sudo cp -r /home/ubuntu/tmp/docker/* /opt/weather-app/",
+      "sudo cp /home/ubuntu/tmp/.env /opt/weather-app/.env",
+
+      "sudo cp /home/ubuntu/tmp/scripts/docker-compose-app.service /etc/systemd/system/weather-app.service",
+
+      "sudo chown -R root:root /opt/weather-app",
+      "sudo chmod 600 /opt/weather-app/.env",
+      "sudo chmod 644 /etc/systemd/system/weather-app.service",
+
+      "cd /opt/weather-app && sudo docker compose pull",
+
+      "sudo systemctl daemon-reload",
+      "sudo systemctl enable weather-app"
     ]
   }
 
