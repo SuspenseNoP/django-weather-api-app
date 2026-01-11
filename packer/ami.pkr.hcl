@@ -28,3 +28,38 @@ source "amazon-ebs" "app" {
     BuildBy     = "packer"
   }
 }
+
+build {
+  sources = ["source.amazon-ebs.app"]
+
+  # Docker
+  provisioner "shell"{
+    script = "../scripts/install_docker.sh"
+  }
+
+  #App Files
+  provisioner "file"{
+    source = "../docker"
+    destination = "/opt/weather-app"
+  }
+
+  provisioner "shell"{
+    inline = [
+      "cd /opt/weather-app",
+      "docker compose pull"
+    ]
+  }
+
+  provisioner "file"{
+    source = "../scripts/docker-compose-app.service"
+    destination = "/etc/systemd/system/weather-app.service"
+  }
+
+  provisioner "shell"{
+    inline = [
+      "systemctl daemon-reload",
+      "systemctl enable weather-app "
+    ]
+  }
+
+}
