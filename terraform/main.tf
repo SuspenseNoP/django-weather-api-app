@@ -1,17 +1,17 @@
 terraform {
   required_providers {
     aws = {
-        source = "hashicorp/aws"
-        version = "~> 6.0"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 
   backend "s3" {
-    bucket         = "django-tfstate-bucket"       
-    key            = "terraform.tfstate"        
+    bucket         = "django-tfstate-bucket"
+    key            = "terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
-    dynamodb_table = "terraform-locks"              
+    dynamodb_table = "terraform-locks"
   }
 }
 
@@ -42,7 +42,7 @@ module "vpc" {
   name = var.vpc_name
   cidr = "10.0.0.0/16"
 
-  azs = ["eu-north-1a"]
+  azs            = ["eu-north-1a"]
   public_subnets = ["10.0.0.0/24"]
 
   enable_nat_gateway = false
@@ -59,29 +59,29 @@ module "web_server_sg" {
   egress_rules = ["all-all"]
 
   ingress_with_cidr_blocks = [
-  {
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
-    description = "Django API"
-    cidr_blocks = "0.0.0.0/0"
-  },
-  {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "SSH"
-    cidr_blocks = "0.0.0.0/0"
-  },
-  {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    description = "HTTPS"
-    cidr_blocks = "0.0.0.0/0"
-  }
+    {
+      from_port   = 8000
+      to_port     = 8000
+      protocol    = "tcp"
+      description = "Django API"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      description = "SSH"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "HTTPS"
+      cidr_blocks = "0.0.0.0/0"
+    }
 
-]
+  ]
 }
 
 resource "aws_key_pair" "ssh_key" {
